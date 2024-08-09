@@ -1,9 +1,9 @@
 // hooks/useNotifications.ts
 "use client";
 import { useState, useEffect } from 'react';
-import { db } from '../../lib/firebaseConfig';
+import { db, onMessageListener } from '../../lib/firebaseConfig';
 import { collection, addDoc, query, onSnapshot, updateDoc, doc } from 'firebase/firestore';
-import { Notification } from './types'; // Correct the import path if necessary
+import { Notification } from './types'; 
 
 const notificationsRef = collection(db, 'notifications');
 
@@ -12,7 +12,7 @@ export function useNotifications() {
 
   useEffect(() => {
     const q = query(notificationsRef);
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    const unsubscribeFirestore = onSnapshot(q, (querySnapshot) => {
       const newNotifications: Notification[] = [];
       querySnapshot.forEach((doc) => {
         newNotifications.push({ id: doc.id, ...doc.data() } as Notification);
@@ -20,7 +20,17 @@ export function useNotifications() {
       setNotifications(newNotifications);
     });
 
-    return () => unsubscribe();
+    onMessageListener()
+      .then((payload: any) => {
+        if (payload.notification?.body) {
+          addNotification('info', payload.notification.body);
+        }
+      })
+      .catch(err => console.log('Failed to receive FCM message:', err));
+
+    return () => {
+      unsubscribeFirestore();
+    };
   }, []);
 
   const addNotification = async (type: 'info' | 'warning' | 'error', message: string) => {

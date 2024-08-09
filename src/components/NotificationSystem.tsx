@@ -5,6 +5,7 @@ import { useNotifications } from '../components/hooks/useNotifications';
 import { Button } from '../components/ui/button'; 
 import PopoverNotification from './PopoverNotification'; // Ensure this path is correct
 import CustomSnackbar from '../components/ui/CustomSnackbar'; 
+// components/NotificationSystem.tsx
 
 const NotificationSystem: React.FC = () => {
   const { notifications, addNotification, markAsRead } = useNotifications();
@@ -34,7 +35,7 @@ const NotificationSystem: React.FC = () => {
           open={snackbarOpen}
           onClose={handleCloseSnackbar}
           message={snackbarMessage}
-          autoHideDuration={600}
+          autoHideDuration={6000}
         />
       </div>
     </div>
@@ -42,3 +43,4 @@ const NotificationSystem: React.FC = () => {
 };
 
 export default NotificationSystem;
+
